@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="Login_Icon">pix/line_discuss.png</file>
+        <file alias="Login_Background">pix/pix_2.jpg</file>
+        <file alias="close">pix/close.png</file>
+        <file alias="min">pix/minus.png</file>
+        <file alias="menu">pix/more.png</file>
+        <file alias="owl">pix/owl.png</file>
+        <file alias="depart">pix/depart.png</file>
+        <file alias="file">pix/File.png</file>
+        <file alias="friend">pix/friend.png</file>
+        <file alias="group">pix/group.png</file>
+        <file alias="info">pix/admin.png</file>
+        <file alias="max">pix/max.png</file>
+        <file alias="files">pix/files.png</file>
+        <file alias="express">pix/expression.png</file>
+        <file alias="history">pix/history.png</file>
+        <file alias="screenshot">pix/screenshot.png</file>
+        <file alias="sendfile">pix/sendFile.png</file>
+        <file alias="setting">pix/setting.png</file>
+        <file alias="modify">pix/modify.png</file>
+        <file alias="add">pix/add.png</file>
+        <file alias="flush">pix/flush.png</file>
+        <file alias="addGroup">pix/addGroup.png</file>
+    </qresource>
+</RCC>
