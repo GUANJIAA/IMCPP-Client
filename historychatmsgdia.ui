@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>addFriendDia</class>
- <widget class="QDialog" name="addFriendDia">
+ <class>historyChatMsgDia</class>
+ <widget class="QDialog" name="historyChatMsgDia">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>310</width>
-    <height>324</height>
+    <width>598</width>
+    <height>418</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -30,9 +30,11 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton_2">
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
+      <widget class="QToolButton" name="toolButton">
+       <property name="font">
+        <font>
+         <pointsize>9</pointsize>
+        </font>
        </property>
        <property name="text">
         <string>...</string>
@@ -55,35 +57,25 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <widget class="QTableWidget" name="tableWidget"/>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLabel" name="label">
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
+      <widget class="QPushButton" name="addChatMsg">
        <property name="text">
-        <string>姓名：</string>
+        <string>加载聊天记录</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="addFirendNameLineEdit"/>
+      <widget class="QPushButton" name="deleteChatMsg">
+       <property name="text">
+        <string>删除聊天记录</string>
+       </property>
+      </widget>
      </item>
     </layout>
-   </item>
-   <item>
-    <widget class="QPushButton" name="pushButton">
-     <property name="font">
-      <font>
-       <pointsize>16</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>添加好友</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

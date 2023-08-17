@@ -187,7 +187,7 @@
       </font>
      </property>
      <property name="text">
-      <string>确认</string>
+      <string>确认修改</string>
      </property>
     </widget>
    </item>

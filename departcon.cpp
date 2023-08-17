@@ -3,11 +3,10 @@
 #include "admincon.h"
 #include "qsocket.h"
 #include "public.h"
+#include "admincon.h"
 
 #include <QDebug>
-
-
-
+#include <QScrollBar>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -24,6 +23,7 @@ DepartCon::DepartCon(QObject *parent)
 {
     connect(&_departmodel,&DepartModel::newDepart,this,&DepartCon::onNewDepartUsersReceived);
     connect(&_departmodel,&DepartModel::newDepartMsg,this,&DepartCon::onNewDepartMessageReceived);
+    connect(&_departmodel,&DepartModel::recvHistoryMsg,this,&DepartCon::onRecvHistroyMsg);
 }
 
 DepartCon *DepartCon::getInstance()
@@ -95,11 +95,11 @@ void DepartCon::onNewDepartMessageReceived()
         // qDebug()<<"----";
         if(msg.sendName==AdminCon::getInstance()->getAdminName())
         {
-            departMsg+=generateDepartMsgHTML(msg.sendName+":"+"<br>"+msg.msg,true);
+            departMsg+=generateDepartMsgHTML(msg.sendName+"<br>"+msg.msg,true);
         }
         else
         {
-            departMsg+=generateDepartMsgHTML(msg.sendName+":"+"<br>"+msg.msg,false);
+            departMsg+=generateDepartMsgHTML(msg.sendName+"<br>"+msg.msg,false);
         }
     }
     departTextBrow->setHtml(departMsg);
@@ -108,6 +108,7 @@ void DepartCon::onNewDepartMessageReceived()
 
 void DepartCon::onNewDepartUsersReceived()
 {
+    departNameLabel->setText(AdminCon::getInstance()->getAdminDepartName());
     QList<QString> list;
     for(auto temp:_departmodel.getCurrentDepart().departUsers)
     {
@@ -116,9 +117,34 @@ void DepartCon::onNewDepartUsersReceived()
     emit showNewDepartUsers(list);
 }
 
+void DepartCon::onRecvHistroyMsg()
+{
+    QString msg;
+    for(auto &val:_departmodel.getDepartMsgs())
+    {
+        if(val.sendName==AdminCon::getInstance()->getAdminName())
+        {
+            msg+=generateDepartMsgHTML(val.sendName+"<br>"+val.msg,true);
+        }
+        else if(val.sendName!=AdminCon::getInstance()->getAdminName())
+        {
+            msg+=generateDepartMsgHTML(val.sendName+"<br>"+val.msg,false);
+        }
+    }
+    departTextBrow->setHtml(msg);
+
+    QScrollBar*vScrollBar=departTextBrow->verticalScrollBar();
+    vScrollBar->setValue(vScrollBar->maximum());
+}
+
 void DepartCon::onSendBtn(bool cliecked)
 {
     Q_UNUSED(cliecked)
+
+    if(AdminCon::getInstance()->getAdminDepartName()=="TEXT")
+    {
+        return ;
+    }
 
     QString sendName = AdminCon::getInstance()->getAdminName();
     QString msg = departSendTextEdit->toPlainText();
@@ -128,8 +154,7 @@ void DepartCon::onSendBtn(bool cliecked)
 
     QJsonObject data;
     data["msgid"] = DEPART_CHAT_MSG;
-    data["groupName"] = _departmodel.getCurrentDepart().departName;
-    // qDebug()<<data["groupName"]<<":"<<_groupmodel.getCurrentGroup().groupName;
+    data["departName"] = _departmodel.getCurrentDepart().departName;
     data["sendName"] = sendName;
     data["message"] = msg;
     QJsonArray recvName;

@@ -27,6 +27,20 @@ public:
 
 signals:
     void switchToWidget();
+
+public slots:
+    void onRecvAddFriend(bool result);
+    void onRecvDelFriend(bool result);
+
+    void onRecvCreateGroup(bool result, QString groupName);
+    void onRecvAddGroup(bool result);
+    void onRecvQUitGroup(bool result);
+
+    void onRecvCreateDepart(bool result);
+    void onRecvDelDepart(bool result);
+    void onRecvAddDepart(bool result);
+    void onRecvQuitDepart(bool result);
+
 private slots:
     void updateAdminData();
     void showFriendsList(const QList<QString>&friends);
@@ -77,6 +91,12 @@ private slots:
     void on_departFlushBtn_clicked();
 
     void on_groupHistoryBtn_clicked();
+
+    void on_departMenuLabel_clicked();
+
+    void on_addDepartBtn_clicked();
+
+    void on_historyBtn_clicked();
 
 private:
     Ui::MainWindow *ui;

@@ -18,6 +18,7 @@ enum ServerTypeId
     DEL_FRIEND_MSG ,         // 删除好友
     QUERY_FRIEND_MSG ,       // 查询好友列表
     GROUP_CHAT_MSG ,         // 群组聊天消息
+    QUERY_GROUPCHAT_MSG,     // 查询群组聊天消息
     CREATE_GROUP_MSG ,       // 创建群组
     ADD_GROUP_MSG ,          // 添加群组
     QUERY_GROUP_MSG ,        // 查询所有群组及所有群友
@@ -30,6 +31,7 @@ enum ServerTypeId
     QUERY_DEPART_USERS_MSG , // 查询所在部门的所有同事
     DEL_DEPART_MSG ,         // 删除部门
     QUIT_DEPART_MSG ,        // 退出部门
+    QUERY_DEPARTCHAT_MSG,    // 查询部门聊天信息
 };
 
 #endif // PUBLIC_H

@@ -22,10 +22,18 @@ void FriendModel::queryChatMsg(QByteArray data)
         for(const QJsonValue& val:chatmsgArray)
         {
             MsgInfo temp;
-            temp.setMsgInfoVal(val["sendName"].toString(),val["recvName"].toString(),val["message"].toString());
+            temp.setMsgInfoVal(val["msgid"].toInt(),val["sendName"].toString(),val["recvName"].toString(),val["message"].toString());
             msgInfoList.push_back(temp);
-            emit newMsg();
         }
+    }
+
+    if(obj["errcode"].toInt()==0)
+    {
+        emit recvHistoryMsg(true);
+    }
+    else
+    {
+        emit recvHistoryMsg(false);
     }
 }
 
@@ -36,20 +44,31 @@ void FriendModel::recvNewMsg(QByteArray data)
     if(obj["message"].toString()!="")
     {
         MsgInfo temp;
-        temp.setMsgInfoVal(obj["sendName"].toString(),AdminCon::getInstance()->getAdminName(),obj["message"].toString());
-        msgInfoList.push_back(temp);
+        temp.setMsgInfoVal(-1,obj["sendName"].toString(),AdminCon::getInstance()->getAdminName(),obj["message"].toString());
+        msgInfoLists[obj["sendName"].toString()].push_back(temp);
         setMsg(temp);
         emit newMsg();
     }
     else if(obj["chatmsgs"].isArray())
     {
+        msgInfoList.clear();
         QJsonArray chatmsgArray = obj.value("chatmsgs").toArray();
+        QString friendName;
         for(const QJsonValue& val:chatmsgArray)
         {
             MsgInfo temp;
-            temp.setMsgInfoVal(val["sendName"].toString(),AdminCon::getInstance()->getAdminName(),val["message"].toString());
+            temp.setMsgInfoVal(val["msgId"].toInt(),val["sendName"].toString(),val["recvName"].toString(),val["message"].toString());
+            if(AdminCon::getInstance()->getAdminName()==val["sendName"].toString())
+            {
+                friendName=val["recvName"].toString();
+            }
             msgInfoList.push_back(temp);
-            emit newMsg();
+        }
+        std::sort(msgInfoList.begin(),msgInfoList.end());
+        msgInfoLists[friendName]=msgInfoList;
+        if(!chatmsgArray.empty())
+        {
+            emit recvHistoryMsg(true);
         }
     }
 }
@@ -82,6 +101,34 @@ void FriendModel::recvNewFriends(QByteArray data)
     }
 }
 
+void FriendModel::recvAddFriendResult(QByteArray data)
+{
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    QJsonObject obj = doc.object();
+    if(obj["errcode"]==0)
+    {
+        emit recvAddFriend(true);
+    }
+    else
+    {
+        emit recvAddFriend(false);
+    }
+}
+
+void FriendModel::recvDeleteFriendResult(QByteArray data)
+{
+        QJsonDocument doc = QJsonDocument::fromJson(data);
+        QJsonObject obj = doc.object();
+        if(obj["errcode"]==0)
+        {
+            emit recvDeleteFriend(true);
+        }
+        else
+        {
+            emit recvDeleteFriend(false);
+        }
+}
+
 QList<FriendInfo> FriendModel::getFriendInfoList() const
 {
     return friendInfoList;
@@ -105,5 +152,21 @@ void FriendModel::setMsg(const MsgInfo &newMsg)
 void FriendModel::addMsgInfo(const MsgInfo &msg)
 {
     msgInfoList.push_back(msg);
+    msgInfoLists[msg.recvName].push_back(msg);
+}
+
+void FriendModel::setMsgInfoList(const QList<MsgInfo> &newMsgInfoList)
+{
+    msgInfoList = newMsgInfoList;
+}
+
+std::unordered_map<QString, QList<MsgInfo> > FriendModel::getMsgInfoLists() const
+{
+    return msgInfoLists;
+}
+
+void FriendModel::setMsgInfoLists(const std::unordered_map<QString, QList<MsgInfo> > &newMsgInfoLists)
+{
+    msgInfoLists = newMsgInfoLists;
 }
 

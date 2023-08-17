@@ -22,8 +22,14 @@ struct departInfo
 
 struct departMsgInfo
 {
+    int msgid=-1;
     QString sendName;
     QString msg;
+
+    bool operator<(const departMsgInfo&other)const
+    {
+        return msgid<other.msgid;
+    }
 };
 
 class DepartModel : public QObject
@@ -34,6 +40,8 @@ public:
 
     void recvNewDepartMsg(QByteArray data);
     void recvNewDepart(QByteArray data);
+    void recvAddDepart(QByteArray data);
+    void recvQuitDepart(QByteArray data);
 
     departInfo getCurrentDepart() const;
     void setCurrentDepart(const departInfo &newCurrentDepart);
@@ -46,9 +54,16 @@ public:
 
     void addDepartMsg(QString sendName,QString msg);
 
+    void clear();
+
 signals:
     void newDepart();
     void newDepartMsg();
+    void recvHistoryMsg();
+    void createDepart(bool result);
+    void delDepart(bool result);
+    void addDepart(bool result);
+    void quitDepart(bool result);
 private:
     departInfo currentDepart;
     QList<departMsgInfo> departMsgs;

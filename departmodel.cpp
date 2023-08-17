@@ -1,5 +1,7 @@
 #include "departmodel.h"
 
+#include "admincon.h"
+
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -36,18 +38,45 @@ void DepartModel::recvNewDepart(QByteArray data)
     {
         emit newDepart();
     }
-
 }
 
+void DepartModel::recvAddDepart(QByteArray data)
+{
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    QJsonObject obj = doc.object();
+
+    if(!obj["errcode"].toInt())
+    {
+        AdminCon::getInstance()->setAdminDepartName(obj["departName"].toString());
+        emit addDepart(true);
+    }
+    else
+    {
+        emit addDepart(false);
+    }
+}
+
+void DepartModel::recvQuitDepart(QByteArray data)
+{
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    QJsonObject obj = doc.object();
+
+    if(!obj["errcode"].toInt())
+    {
+        emit quitDepart(true);
+    }
+    else
+    {
+        emit quitDepart(false);
+    }
+}
 
 void DepartModel::recvNewDepartMsg(QByteArray data)
 {
     QJsonDocument doc = QJsonDocument::fromJson(data);
     QJsonObject obj = doc.object();
-    //qDebug()<<"----";
     if(obj["message"].toString()!="")
     {
-        //qDebug()<<"----";
         departMsgInfo temp;
         temp.sendName = obj["sendName"].toString();
         temp.msg = obj["message"].toString();
@@ -55,17 +84,26 @@ void DepartModel::recvNewDepartMsg(QByteArray data)
         setCurrentMsg(temp);
         emit newDepartMsg();
     }
-//    else if(obj["chatmsgs"].isArray())
-//    {
-//        QJsonArray chatmsgArray = obj.value("chatmsgs").toArray();
-//        for(const QJsonValue& val:chatmsgArray)
-//        {
-//            MsgInfo temp;
-//            temp.setMsgInfoVal(val["sendName"].toString(),AdminCon::getInstance()->getAdminName(),val["message"].toString());
-//            msgInfoList.push_back(temp);
-//            emit newDepartMsg();
-//        }
-//    }
+    else if(obj["chatmsgs"].isArray())
+    {
+        departMsgs.clear();
+        QJsonArray chatmsgArray = obj.value("chatmsgs").toArray();
+        for(const QJsonValue& val:chatmsgArray)
+        {
+            departMsgInfo temp;
+            temp.msgid=val["msgId"].toInt();
+            temp.sendName = val["sendName"].toString();
+            temp.msg = val["message"].toString();
+            departMsgs.push_back(temp);
+            setCurrentMsg(temp);
+        }
+        std::sort(departMsgs.begin(),departMsgs.end());
+        if(!chatmsgArray.empty())
+        {
+            emit recvHistoryMsg();
+        }
+    }
+
 }
 
 departInfo DepartModel::getCurrentDepart() const
@@ -104,5 +142,15 @@ void DepartModel::addDepartMsg(QString sendName,QString msg)
     temp.sendName=sendName;
     temp.msg=msg;
     departMsgs.push_back(temp);
+}
+
+void DepartModel::clear()
+{
+    currentMsg.sendName="";
+    currentMsg.msg="";
+    currentDepart.departName="";
+    currentDepart.departDesc="";
+    currentDepart.departUsers.clear();
+    departMsgs.clear();
 }
 

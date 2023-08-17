@@ -80,5 +80,7 @@ void friendInfo::on_deleteFriendBtn_clicked()
     QJsonDocument doc(data);
     QByteArray json = doc.toJson();
     QSocket::getInstance().sendData(json);
+
+    this->close();
 }
 

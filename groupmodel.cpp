@@ -6,10 +6,7 @@
 #include <QJsonValue>
 
 GroupModel::GroupModel(QObject *parent)
-    : QObject{parent}
-{
-
-}
+    : QObject{parent}{}
 
 void GroupModel::recvNewMsg(QByteArray data)
 {
@@ -17,34 +14,46 @@ void GroupModel::recvNewMsg(QByteArray data)
     QJsonObject obj = doc.object();
     if(obj["message"].toString()!="")
     {
-        bool temp=false;
+        groupMsgInfo msgInfo;
+        msgInfo.msgId=obj["msgId"].toInt();
+        msgInfo.groupName=obj["groupName"].toString();
+        msgInfo.sendName=obj["sendName"].toString();
+        msgInfo.message=obj["message"].toString();
+        if(currentGroup.groupName==msgInfo.groupName)
+        {
+            currentMsg.push_back(msgInfo);
+        }
+        groupMsgs[msgInfo.groupName]=currentMsg;
+        emit newMsg(msgInfo.groupName);
+    }
+    else if(obj["chatmsgs"].isArray())
+    {
+        QJsonArray chatmsgArray = obj.value("chatmsgs").toArray();
+        groupMsgs.clear();
+        currentMsg.clear();
+        for(const QJsonValue& val:chatmsgArray)
+        {
+            groupMsgInfo msgInfo;
+            msgInfo.msgId=val["msgId"].toInt();
+            msgInfo.groupName=val["groupName"].toString();
+            msgInfo.sendName=val["sendName"].toString();
+            msgInfo.message=val["message"].toString();
+            if(currentGroup.groupName==msgInfo.groupName)
+            {
+                currentMsg.push_back(msgInfo);
+            }
+            groupMsgs[msgInfo.groupName].push_back(msgInfo);
+        }
         for(auto &val:groupMsgs)
         {
-            if(val.groupName==obj["groupName"].toString())
-            {
-                temp=true;
-                val.groupMsg.push_back({obj["sendName"].toString(),obj["message"].toString()});
-            }
+            std::sort(val.second.begin(),val.second.end());
         }
-        if(!temp)
+        if(!chatmsgArray.empty())
         {
-            groupMsgInfo msginfo;
-            msginfo.groupName=obj["groupName"].toString();
-            msginfo.groupMsg.push_back({obj["sendName"].toString(),obj["message"].toString()});
-            groupMsgs.push_back(msginfo);
+
+            emit newMsg(currentGroup.groupName);
         }
-        emit newMsg(obj["groupName"].toString());
     }
-//    else if(obj["chatmsgs"].isArray())
-//    {
-//        QJsonArray chatmsgArray = obj.value("chatmsgs").toArray();
-//        for(const QJsonValue& val:chatmsgArray)
-//        {
-//            MsgInfo temp;
-//            temp.setMsgInfoVal(val["sendName"].toString(),AdminCon::getInstance()->getAdminName(),val["message"].toString());
-//            msgInfoList.push_back(temp);
-//        }
-//    }
 }
 
 void GroupModel::recvNewGroups(QByteArray data)
@@ -59,7 +68,7 @@ void GroupModel::recvNewGroups(QByteArray data)
         {
             groupInfo temp;
             temp.groupName = val["groupName"].toString();
-            temp.groupDesc = val["grouDesc"].toString();
+            temp.groupDesc = val["groupDesc"].toString();
             if(val["users"].isArray())
             {
                 QJsonArray usersArray = val["users"].toArray();
@@ -83,6 +92,48 @@ void GroupModel::recvNewGroups(QByteArray data)
     }
 }
 
+void GroupModel::recvCreateGroupResult(QByteArray data)
+{
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    QJsonObject obj = doc.object();
+    if(!obj["errcode"].toInt())
+    {
+        emit recvCreateGroup(true,obj["groupName"].toString());
+    }
+    else
+    {
+        emit recvCreateGroup(false,"");
+    }
+}
+
+void GroupModel::recvAddGroupResult(QByteArray data)
+{
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    QJsonObject obj = doc.object();
+    if(!obj["errcode"].toInt())
+    {
+        emit recvAddGroup(true);
+    }
+    else
+    {
+        emit recvAddGroup(false);
+    }
+}
+
+void GroupModel::recvQuitGroupResult(QByteArray data)
+{
+    QJsonDocument doc = QJsonDocument::fromJson(data);
+    QJsonObject obj = doc.object();
+    if(!obj["errcode"].toInt())
+    {
+        emit recvQuitGroup(true);
+    }
+    else
+    {
+        emit recvQuitGroup(false);
+    }
+}
+
 QList<groupInfo> GroupModel::getGroups() const
 {
     return groups;
@@ -91,16 +142,6 @@ QList<groupInfo> GroupModel::getGroups() const
 void GroupModel::setGroups(const QList<groupInfo> &newGroups)
 {
     groups = newGroups;
-}
-
-QList<groupMsgInfo> GroupModel::getGroupMsgs() const
-{
-    return groupMsgs;
-}
-
-void GroupModel::setGroupMsgs(const QList<groupMsgInfo> &newGroupMsgs)
-{
-    groupMsgs = newGroupMsgs;
 }
 
 groupInfo GroupModel::getCurrentGroup() const
@@ -115,11 +156,21 @@ void GroupModel::setCurrentGroup(const groupInfo &newCurrentGroup)
 
 void GroupModel::addMsg(const QString &name, const QString &msg)
 {
-    for(auto &group:groupMsgs)
-    {
-        if(group.groupName==currentGroup.groupName)
-        {
-            group.groupMsg.push_back({name,msg});
-        }
-    }
+    groupMsgInfo temp;
+    QString groupName=currentGroup.groupName;
+    temp.groupName=groupName;
+    temp.sendName=name;
+    temp.message=msg;
+    currentMsg.push_back(temp);
+    groupMsgs["groupName"].push_back(temp);
+}
+
+QList<groupMsgInfo> GroupModel::getCurrentMsg() const
+{
+    return currentMsg;
+}
+
+void GroupModel::setCurrentMsg(const QList<groupMsgInfo> &newCurrentMsg)
+{
+    currentMsg = newCurrentMsg;
 }

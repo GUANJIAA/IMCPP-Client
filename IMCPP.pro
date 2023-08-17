@@ -12,6 +12,7 @@ RC_ICONS = app.ico
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    adddepart.cpp \
     addfrienddia.cpp \
     addgroupdia.cpp \
     admincon.cpp \
@@ -19,12 +20,15 @@ SOURCES += \
     creategroupdia.cpp \
     dataprocessor.cpp \
     departcon.cpp \
+    departinfo.cpp \
     departmodel.cpp \
     friendcon.cpp \
     friendinfo.cpp \
     friendmodel.cpp \
     groupcon.cpp \
+    groupinfodia.cpp \
     groupmodel.cpp \
+    historychatmsgdia.cpp \
     logincon.cpp \
     loginmodel.cpp \
     loginui.cpp \
@@ -35,6 +39,7 @@ SOURCES += \
     retrieveui.cpp
 
 HEADERS += \
+    adddepart.h \
     addfrienddia.h \
     addgroupdia.h \
     admincon.h \
@@ -42,12 +47,15 @@ HEADERS += \
     creategroupdia.h \
     dataprocessor.h \
     departcon.h \
+    departinfo.h \
     departmodel.h \
     friendcon.h \
     friendinfo.h \
     friendmodel.h \
     groupcon.h \
+    groupinfodia.h \
     groupmodel.h \
+    historychatmsgdia.h \
     logincon.h \
     loginmodel.h \
     loginui.h \
@@ -58,11 +66,15 @@ HEADERS += \
     retrieveui.h
 
 FORMS += \
+    adddepart.ui \
     addfrienddia.ui \
     addgroupdia.ui \
     admininfo.ui \
     creategroupdia.ui \
+    departinfo.ui \
     friendinfo.ui \
+    groupinfodia.ui \
+    historychatmsgdia.ui \
     loginui.ui \
     mainwindow.ui \
     registerui.ui \

@@ -10,6 +10,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QByteArray>
+#include <QScrollBar>
 
 QString generateGroupMessageHTML(const QString& text, bool isSentByMe) {
     QString alignment = isSentByMe ? "right" : "left";
@@ -97,33 +98,39 @@ void GroupCon::setGroupDescBrow(QTextBrowser *newGroupDescBrow)
 
 void GroupCon::onNewGroupMessageReceived(QString groupName)
 {
-    // qDebug()<<groupName<<":"<<_groupmodel.getCurrentGroup().groupName;
-    if(!(groupName==_groupmodel.getCurrentGroup().groupName))
+    QString groupMsg;
+    for(auto &val:_groupmodel.getCurrentMsg())
     {
-        // qDebug()<<"test";
-        return ;
-    }
-    for(auto &val:_groupmodel.getGroupMsgs())
-    {
-        if(val.groupName==groupName)
+//        if(val.groupName==groupName)
+//        {
+//            QString groupMsg;
+//            for(auto &msg:val.groupMsg)
+//            {
+//                if(msg.first==AdminCon::getInstance()->getAdminName())
+//                {
+//                    groupMsg+=generateGroupMessageHTML(msg.first+":"+"<br>"+msg.second,true);
+//                }
+//                else
+//                {
+//                    groupMsg+=generateGroupMessageHTML(msg.first+":"+"<br>"+msg.second,false);
+//                }
+//            }
+//            groupTextBrow->setHtml(groupMsg);
+//            break;
+//        }
+        if(val.sendName==AdminCon::getInstance()->getAdminName())
         {
-            QString groupMsg;
-            for(auto &msg:val.groupMsg)
-            {
-                // qDebug()<<msg.first+":"+"<br>"+msg.second;
-                if(msg.first==AdminCon::getInstance()->getAdminName())
-                {
-                    groupMsg+=generateGroupMessageHTML(msg.first+":"+"<br>"+msg.second,true);
-                }
-                else
-                {
-                    groupMsg+=generateGroupMessageHTML(msg.first+":"+"<br>"+msg.second,false);
-                }
-            }
-            groupTextBrow->setHtml(groupMsg);
-            break;
+            groupMsg+=generateGroupMessageHTML(val.sendName+"<br>"+val.message,true);
+        }
+        else
+        {
+            groupMsg+=generateGroupMessageHTML(val.sendName+"<br>"+val.message,false);
         }
     }
+    groupTextBrow->setHtml(groupMsg);
+
+    QScrollBar*vScrollBar=groupTextBrow->verticalScrollBar();
+    vScrollBar->setValue(vScrollBar->maximum());
 }
 
 void GroupCon::onNewGroupsReceived()
@@ -138,28 +145,8 @@ void GroupCon::onNewGroupsReceived()
 
 void GroupCon::onGroupSelect(QListWidgetItem*groupName)
 {
-    for(auto &group:_groupmodel.getGroupMsgs())
-    {
-        if(group.groupName==groupName->text())
-        {
-            QString groupMsg;
-            for(auto &msg:group.groupMsg)
-            {
-                if(msg.first==AdminCon::getInstance()->getAdminName())
-                {
-                    groupMsg+=generateGroupMessageHTML(msg.first+":"+"<br>"+msg.first,true);
-                }
-                else
-                {
-                    groupMsg+=generateGroupMessageHTML(msg.first+":"+"<br>"+msg.first,false);
-                }
-            }
-            groupTextBrow->setHtml(groupMsg);
-            break;
-        }
-
-    }
     bool temp = false;
+
     for(auto &group:_groupmodel.getGroups())
     {
         if(group.groupName==groupName->text())
@@ -167,10 +154,27 @@ void GroupCon::onGroupSelect(QListWidgetItem*groupName)
             groupNameLabel->setText(groupName->text());
             temp = true;
             _groupmodel.setCurrentGroup(group);
-            //qDebug()<<group.groupName;
+            qDebug()<<group.groupName<<"-"<<group.groupDesc;
             break;
         }
     }
+
+
+    QString groupMsg;
+    for(auto &msg:_groupmodel.groupMsgs[groupName->text()])
+    {
+        if(msg.sendName==AdminCon::getInstance()->getAdminName())
+        {
+            groupMsg+=generateGroupMessageHTML(msg.sendName+"<br>"+msg.message,true);
+        }
+        else
+        {
+            groupMsg+=generateGroupMessageHTML(msg.sendName+"<br>"+msg.message,false);
+        }
+    }
+    groupTextBrow->setHtml(groupMsg);
+
+
 
     if(temp)
     {
@@ -185,6 +189,10 @@ void GroupCon::onGroupSelect(QListWidgetItem*groupName)
     groupDesc+="群组姓名："+_groupmodel.getCurrentGroup().groupName+"\n";
     groupDesc+="群组描述："+_groupmodel.getCurrentGroup().groupDesc+"\n";
     groupDescBrow->setText(groupDesc);
+
+    _groupmodel.setCurrentMsg(_groupmodel.groupMsgs[_groupmodel.getCurrentGroup().groupName]);
+    QScrollBar*vScrollBar=groupTextBrow->verticalScrollBar();
+    vScrollBar->setValue(vScrollBar->maximum());
 }
 
 void GroupCon::onGroupUserSelect(QListWidgetItem *userName)
@@ -223,7 +231,6 @@ void GroupCon::onSendBtn(bool cliecked)
     QJsonObject data;
     data["msgid"] = GROUP_CHAT_MSG;
     data["groupName"] = _groupmodel.getCurrentGroup().groupName;
-    // qDebug()<<data["groupName"]<<":"<<_groupmodel.getCurrentGroup().groupName;
     data["sendName"] = sendName;
     data["message"] = msg;
     QJsonArray recvName;
@@ -244,4 +251,6 @@ void GroupCon::onSendBtn(bool cliecked)
     sendName=generateGroupMessageHTML(sendName,true);
     msg=generateGroupMessageHTML(msg,true);
     groupTextBrow->setHtml(groupTextBrow->toHtml()+sendName+msg);
+    QScrollBar*vScrollBar=groupTextBrow->verticalScrollBar();
+    vScrollBar->setValue(vScrollBar->maximum());
 }

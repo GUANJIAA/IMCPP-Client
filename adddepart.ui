@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>addFriendDia</class>
- <widget class="QDialog" name="addFriendDia">
+ <class>AddDepart</class>
+ <widget class="QDialog" name="AddDepart">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>310</width>
-    <height>324</height>
+    <width>241</width>
+    <height>144</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -30,10 +30,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QToolButton" name="toolButton_2">
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
+      <widget class="QToolButton" name="toolButton">
        <property name="text">
         <string>...</string>
        </property>
@@ -43,8 +40,8 @@
        </property>
        <property name="iconSize">
         <size>
-         <width>40</width>
-         <height>40</height>
+         <width>20</width>
+         <height>20</height>
         </size>
        </property>
        <property name="autoRaise">
@@ -55,33 +52,23 @@
     </layout>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLabel" name="label">
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
        <property name="text">
-        <string>姓名：</string>
+        <string>部门名称：</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="addFirendNameLineEdit"/>
+      <widget class="QLineEdit" name="addDepartName"/>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton">
-     <property name="font">
-      <font>
-       <pointsize>16</pointsize>
-      </font>
-     </property>
+    <widget class="QPushButton" name="addDepartBtn">
      <property name="text">
-      <string>添加好友</string>
+      <string>加入部门</string>
      </property>
     </widget>
    </item>

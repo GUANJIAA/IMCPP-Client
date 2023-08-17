@@ -27,7 +27,7 @@ void DataProcessor::processData(const QByteArray &data)
         }
         QByteArray recvData = temp.mid(0,delimitPos);
         temp=temp.mid(delimitPos+delimiter.length());
-        // qDebug()<<recvData;
+        qDebug()<<recvData;
         QJsonDocument doc = QJsonDocument::fromJson(recvData);
         QJsonObject obj = doc.object();
         if(obj["msgid"].toInt()==LOGIN_MSG)
@@ -64,15 +64,39 @@ void DataProcessor::processData(const QByteArray &data)
         }
         else if(obj["msgid"].toInt()==QUERY_CHAT_MSG)
         {
-            FriendCon::getInstance()->_friendmodel.queryChatMsg(recvData);
+            FriendCon::getInstance()->_friendmodel.recvNewMsg(recvData);
         }
         else if(obj["msgid"].toInt()==QUERY_OFFLINE_CHAT_MSG)
         {
             FriendCon::getInstance()->_friendmodel.recvNewMsg(recvData);
         }
+        else if(obj["msgid"].toInt()==ADD_FRIEND_MSG)
+        {
+            FriendCon::getInstance()->_friendmodel.recvAddFriendResult(recvData);
+        }
+        else if(obj["msgid"].toInt()==DEL_FRIEND_MSG)
+        {
+            FriendCon::getInstance()->_friendmodel.recvDeleteFriendResult(recvData);
+        }
         else if(obj["msgid"].toInt()==GROUP_CHAT_MSG)
         {
             GroupCon::getInstance()->_groupmodel.recvNewMsg(recvData);
+        }
+        else if(obj["msgid"].toInt()==QUERY_GROUPCHAT_MSG)
+        {
+            GroupCon::getInstance()->_groupmodel.recvNewMsg(recvData);
+        }
+        else if(obj["msgid"].toInt()==CREATE_GROUP_MSG)
+        {
+            GroupCon::getInstance()->_groupmodel.recvCreateGroupResult(recvData);
+        }
+        else if(obj["msgid"].toInt()==ADD_GROUP_MSG)
+        {
+            GroupCon::getInstance()->_groupmodel.recvAddGroupResult(recvData);
+        }
+        else if(obj["msgid"].toInt()==QUIT_GROUP_MSG)
+        {
+            GroupCon::getInstance()->_groupmodel.recvQuitGroupResult(recvData);
         }
         else if(obj["msgid"].toInt()==QUERY_GROUP_MSG)
         {
@@ -86,9 +110,17 @@ void DataProcessor::processData(const QByteArray &data)
         {
             DepartCon::getInstance()->_departmodel.recvNewDepartMsg(recvData);
         }
+        else if(obj["msgid"].toInt()==QUERY_DEPARTCHAT_MSG)
+        {
+            DepartCon::getInstance()->_departmodel.recvNewDepartMsg(recvData);
+        }
         else if(obj["msgid"].toInt()==ADD_DEPART_MSG)
         {
-
+            DepartCon::getInstance()->_departmodel.recvAddDepart(recvData);
+        }
+        else if(obj["msgid"].toInt()==QUIT_DEPART_MSG)
+        {
+            DepartCon::getInstance()->_departmodel.recvQuitDepart(recvData);
         }
     }
 

@@ -11,14 +11,20 @@
 #include "addgroupdia.h"
 #include "creategroupdia.h"
 #include "departcon.h"
+#include "historychatmsgdia.h"
+#include "adddepart.h"
+#include "departinfo.h"
+#include "groupinfodia.h"
 
 #include <QDebug>
+#include <unistd.h>
 #include <QTimer>
 #include <QThread>
 #include <QPushButton>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QByteArray>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -83,6 +89,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->departUserListWidget,&QListWidget::itemClicked,DepartCon::getInstance(),&DepartCon::onDepartUserSelect);
     connect(ui->departSendBtn,&QPushButton::clicked,DepartCon::getInstance(),&DepartCon::onSendBtn);
+
+    connect(&FriendCon::getInstance()->_friendmodel,&FriendModel::recvAddFriend,this,&MainWindow::onRecvAddFriend);
+    connect(&FriendCon::getInstance()->_friendmodel,&FriendModel::recvDeleteFriend,this,&MainWindow::onRecvDelFriend);
+
+    connect(&GroupCon::getInstance()->_groupmodel,&GroupModel::recvCreateGroup,this,&MainWindow::onRecvCreateGroup);
+    connect(&GroupCon::getInstance()->_groupmodel,&GroupModel::recvAddGroup,this,&MainWindow::onRecvAddGroup);
+    connect(&GroupCon::getInstance()->_groupmodel,&GroupModel::recvQuitGroup,this,&MainWindow::onRecvQUitGroup);
+
+    connect(&DepartCon::getInstance()->_departmodel,&DepartModel::createDepart,this,&MainWindow::onRecvCreateDepart);
+    connect(&DepartCon::getInstance()->_departmodel,&DepartModel::delDepart,this,&MainWindow::onRecvDelDepart);
+    connect(&DepartCon::getInstance()->_departmodel,&DepartModel::addDepart,this,&MainWindow::onRecvAddDepart);
+    connect(&DepartCon::getInstance()->_departmodel,&DepartModel::quitDepart,this,&MainWindow::onRecvQuitDepart);
 }
 
 MainWindow::~MainWindow()
@@ -115,6 +133,221 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event)
     isPressedWidget = false; // 鼠标松开时，置为false
 }
 
+void MainWindow::onRecvAddFriend(bool result)
+{
+    if(result)
+    {
+        QJsonObject data;
+        data["msgid"] = QUERY_FRIEND_MSG;
+        data["userName"] = AdminCon::getInstance()->getAdminName();
+
+        QJsonDocument doc(data);
+        QByteArray json = doc.toJson();
+        QSocket::getInstance().sendData(json);
+    }
+    else
+    {
+        QMessageBox::information(this,"message","add friend faild");
+    }
+}
+
+void MainWindow::onRecvDelFriend(bool result)
+{
+    if(result)
+    {
+        ui->friendTextEdit->clear();
+        ui->friendTextBro->clear();
+        ui->friendNameLabel->clear();
+
+        QJsonObject data;
+        data["msgid"] = QUERY_FRIEND_MSG;
+        data["userName"] = AdminCon::getInstance()->getAdminName();
+
+        QJsonDocument doc(data);
+        QByteArray json = doc.toJson();
+        QSocket::getInstance().sendData(json);
+    }
+    else
+    {
+        QMessageBox::information(this,"message","del friend faild");
+    }
+}
+
+void MainWindow::onRecvCreateGroup(bool result,QString groupName)
+{
+    if(result)
+    {
+        {
+            QJsonObject data;
+            data["msgid"] = ADD_GROUP_MSG;
+            data["groupName"]=groupName;
+            data["userName"]=AdminCon::getInstance()->getAdminName();
+            data["userRole"] = "creator";
+
+            QJsonDocument doc(data);
+            QByteArray json = doc.toJson();
+            QSocket::getInstance().sendData(json);
+        }
+
+        QJsonObject data;
+        data["msgid"] = QUERY_GROUP_MSG;
+        data["userName"]=AdminCon::getInstance()->getAdminName();
+
+        QJsonDocument doc(data);
+        QByteArray json = doc.toJson();
+        QSocket::getInstance().sendData(json);
+    }
+    else
+    {
+        QMessageBox::information(this,"message","create depart faild");
+    }
+}
+
+void MainWindow::onRecvAddGroup(bool result)
+{
+    if(result)
+    {
+        QJsonObject data;
+        data["msgid"] = QUERY_GROUP_MSG;
+        data["userName"]=AdminCon::getInstance()->getAdminName();
+
+        QJsonDocument doc(data);
+        QByteArray json = doc.toJson();
+        QSocket::getInstance().sendData(json);
+    }
+    else
+    {
+        QMessageBox::information(this,"message","create depart faild");
+    }
+}
+
+void MainWindow::onRecvQUitGroup(bool result)
+{
+    if(result)
+    {
+        ui->groupChatTextBrow->clear();
+        ui->groupDescTextBrow->clear();
+        ui->groupNameLabel->clear();
+        ui->groupUsersListWidget->clear();
+
+        QJsonObject data;
+        data["msgid"] = QUERY_GROUP_MSG;
+        data["userName"]=AdminCon::getInstance()->getAdminName();
+
+        QJsonDocument doc(data);
+        QByteArray json = doc.toJson();
+        QSocket::getInstance().sendData(json);
+    }
+    else
+    {
+        QMessageBox::information(this,"message","create depart faild");
+    }
+}
+
+void MainWindow::onRecvCreateDepart(bool result)
+{
+    if(result)
+    {
+        QJsonObject data;
+        data["msgid"] = QUERY_DEPART_USERS_MSG;
+        data["userName"]=AdminCon::getInstance()->getAdminName();
+
+        QJsonDocument doc(data);
+        QByteArray json = doc.toJson();
+        QSocket::getInstance().sendData(json);
+    }
+    else
+    {
+        QMessageBox::information(this,"message","create depart faild");
+    }
+}
+
+void MainWindow::onRecvDelDepart(bool result)
+{
+    if(result)
+    {
+        ui->departChatTextBrow->clear();
+        ui->departNameLabel->clear();
+        ui->departUserListWidget->clear();
+        ui->departSendTextEdit->clear();
+
+        DepartCon::getInstance()->_departmodel.clear();
+    }
+    else
+    {
+        QMessageBox::information(this,"message","del depart faild");
+    }
+}
+
+void MainWindow::onRecvAddDepart(bool result)
+{
+    if(result)
+    {
+        {
+            QJsonObject data;
+            data["msgid"]=UPDATE_ADMININFO;
+            data["userName"] = AdminCon::getInstance()->getAdminName();
+            data["userPwd"] = AdminCon::getInstance()->getAdminPwd();
+            data["userEmail"] = AdminCon::getInstance()->getAdminEmail();
+            data["userPhone"] = AdminCon::getInstance()->getAdminPhone();
+            data["userDesc"] = AdminCon::getInstance()->getAdminDesc();
+            data["userDepartName"] = AdminCon::getInstance()->getAdminDepartName();
+
+            QJsonDocument doc(data);
+            QByteArray json = doc.toJson();
+            QSocket::getInstance().sendData(json);
+        }
+
+        sleep(1);
+
+        {
+            QJsonObject data;
+            data["msgid"] = QUERY_DEPART_USERS_MSG;
+            data["userName"]=AdminCon::getInstance()->getAdminName();
+
+            QJsonDocument doc(data);
+            QByteArray json = doc.toJson();
+            QSocket::getInstance().sendData(json);
+        }
+
+    }
+    else
+    {
+        QMessageBox::information(this,"message","create depart faild");
+    }
+}
+
+void MainWindow::onRecvQuitDepart(bool result)
+{
+    if(result)
+    {
+        ui->departChatTextBrow->clear();
+        ui->departNameLabel->clear();
+        ui->departUserListWidget->clear();
+        ui->departSendTextEdit->clear();
+        ui->departNoticeTextBrow->clear();
+
+        DepartCon::getInstance()->_departmodel.clear();
+
+        QJsonObject data;
+        data["msgid"]=UPDATE_ADMININFO;
+        data["userName"] = AdminCon::getInstance()->getAdminName();
+        data["userPwd"] = AdminCon::getInstance()->getAdminPwd();
+        data["userEmail"] = AdminCon::getInstance()->getAdminEmail();
+        data["userPhone"] = AdminCon::getInstance()->getAdminPhone();
+        data["userDesc"] = AdminCon::getInstance()->getAdminDesc();
+        data["userDepartName"] = "TEXT";
+
+        QJsonDocument doc(data);
+        QByteArray json = doc.toJson();
+        QSocket::getInstance().sendData(json);
+    }
+    else
+    {
+        QMessageBox::information(this,"message","quit depart faild");
+    }
+}
+
 void MainWindow::updateAdminData()
 {
     ui->adminNameLabel->setText(AdminCon::getInstance()->getAdminName());
@@ -126,7 +359,6 @@ void MainWindow::updateAdminData()
 
 void MainWindow::showFriendsList(const QList<QString>&friends)
 {
-    //qDebug()<<"text";
     ui->friendList->clear();
     QFont font = ui->friendList->font();
     font.setPointSize(16);
@@ -230,6 +462,11 @@ void MainWindow::closewidget()
 
 void MainWindow::on_friendMenuBtn_clicked()
 {
+    if(FriendCon::getInstance()->getFriendName()->text()=="")
+    {
+        return ;
+    }
+
     friendInfo UI(this);
     UI.setModal(true);
     UI.exec();
@@ -270,23 +507,53 @@ void MainWindow::on_friendAddBtn_clicked()
 
 void MainWindow::on_historyChatBtn_clicked()
 {
-    QJsonObject data;
-    data["msgid"] = QUERY_CHAT_MSG;
-    data["recvName"] = AdminCon::getInstance()->getAdminName();
-    data["sendName"] = ui->friendNameLabel->text();
+    if(FriendCon::getInstance()->getFriendName()->text()=="")
+    {
+        return ;
+    }
 
-    QJsonDocument doc(data);
-    QByteArray json = doc.toJson();
-    QSocket::getInstance().sendData(json);
+    QStringList sendNames;
+    QStringList messages;
+    std::vector<int> vec;
+    for(auto &val:FriendCon::getInstance()->_friendmodel.getMsgInfoList())
+    {
+        if(val.sendName==AdminCon::getInstance()->getAdminName()&&
+            val.recvName==FriendCon::getInstance()->currentFriend.userName)
+        {
+            sendNames.push_back(val.sendName);
+            messages.push_back(val.msg);
+            vec.push_back(val.msgid);
+        }
+        else if(val.recvName==AdminCon::getInstance()->getAdminName()&&
+                   val.sendName==FriendCon::getInstance()->currentFriend.userName)
+        {
+            sendNames.push_back(val.sendName);
+            messages.push_back(val.msg);
+            vec.push_back(val.msgid);
+        }
+    }
+    historyChatMsgDia UI(this);
+    UI.setData(vec,sendNames,messages);
+    UI.setModal(this);
+    UI.exec();
 }
 
 
 void MainWindow::on_groupMenuBtn_clicked()
 {
-    QString groupDesc;
-    groupDesc+="群组姓名："+GroupCon::getInstance()->_groupmodel.getCurrentGroup().groupName+"\n";
-    groupDesc+="群组描述："+GroupCon::getInstance()->_groupmodel.getCurrentGroup().groupDesc+"\n";
-    GroupCon::getInstance()->getGroupDescBrow()->setText(groupDesc);
+//    QString groupDesc;
+//    groupDesc+="群组姓名："+GroupCon::getInstance()->_groupmodel.getCurrentGroup().groupName+"\n";
+//    groupDesc+="群组描述："+GroupCon::getInstance()->_groupmodel.getCurrentGroup().groupDesc+"\n";
+//    GroupCon::getInstance()->getGroupDescBrow()->setText(groupDesc);
+
+    if(ui->groupNameLabel->text()=="")
+    {
+        return ;
+    }
+
+    GroupInfoDia UI(this);
+    UI.setModal(this);
+    UI.exec();
 }
 
 void MainWindow::on_groupFlushBtn_clicked()
@@ -320,6 +587,11 @@ void MainWindow::on_createGroupBtn_clicked()
 
 void MainWindow::on_departFlushBtn_clicked()
 {
+    if(AdminCon::getInstance()->getAdminDepartName()=="TEXT")
+    {
+        return ;
+    }
+
     QJsonObject data;
     data["msgid"] = QUERY_DEPART_USERS_MSG;
     data["userName"]=AdminCon::getInstance()->getAdminName();
@@ -332,13 +604,80 @@ void MainWindow::on_departFlushBtn_clicked()
 
 void MainWindow::on_groupHistoryBtn_clicked()
 {
-    QJsonObject data;
-    data["msgid"] = GROUP_CHAT_MSG;
-    data["recvName"] = AdminCon::getInstance()->getAdminName();
-    data["sendName"] = ui->friendNameLabel->text();
+    if(ui->groupNameLabel->text()=="")
+    {
+        return ;
+    }
 
-    QJsonDocument doc(data);
-    QByteArray json = doc.toJson();
-    QSocket::getInstance().sendData(json);
+    QStringList sendNames;
+    QStringList messages;
+    std::vector<int> vec;
+    for(auto val:GroupCon::getInstance()->_groupmodel.getCurrentMsg())
+    {
+        sendNames.push_back(val.sendName);
+        messages.push_back(val.message);
+        vec.push_back(val.msgId);
+    }
+    historyChatMsgDia UI(this);
+    UI.getDeleteMsgBtn()->setEnabled(false);
+    UI.setData(vec,sendNames,messages);
+    UI.setChat("Group");
+    UI.setModal(this);
+    UI.exec();
+
+    //    QJsonObject data;
+    //    data["msgid"] = GROUP_CHAT_MSG;
+    //    data["recvName"] = AdminCon::getInstance()->getAdminName();
+    //    data["sendName"] = ui->friendNameLabel->text();
+
+    //    QJsonDocument doc(data);
+    //    QByteArray json = doc.toJson();
+    //    QSocket::getInstance().sendData(json);
 }
+
+
+void MainWindow::on_departMenuLabel_clicked()
+{
+    if(DepartCon::getInstance()->getDepartNameLabel()->text()=="")
+    {
+        return ;
+    }
+
+    DepartInfo UI(this);
+    UI.setModal(this);
+    UI.exec();
+}
+
+
+void MainWindow::on_addDepartBtn_clicked()
+{
+    AddDepart UI(this);
+    UI.setModal(this);
+    UI.exec();
+}
+
+
+void MainWindow::on_historyBtn_clicked()
+{
+    if(AdminCon::getInstance()->getAdminDepartName()=="TEXT")
+    {
+        return ;
+    }
+
+    QStringList sendNames;
+    QStringList messages;
+    std::vector<int> vec;
+    for(auto val:DepartCon::getInstance()->_departmodel.getDepartMsgs())
+    {
+        sendNames.push_back(val.sendName);
+        messages.push_back(val.msg);
+    }
+    historyChatMsgDia UI(this);
+    UI.getDeleteMsgBtn()->setEnabled(false);
+    UI.setData(vec,sendNames,messages);
+    UI.setChat("Depart");
+    UI.setModal(this);
+    UI.exec();
+}
+
 

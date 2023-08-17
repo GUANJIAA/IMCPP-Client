@@ -44,6 +44,7 @@ public:
 signals:
     void showNewFriends(const QList<QString>&friends);
 public slots:
+    void onHistoryMsg(bool result);
     void onNewMessageReceived();
     void onNewFriendsReceived();
 

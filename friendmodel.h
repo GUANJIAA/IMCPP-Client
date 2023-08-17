@@ -24,13 +24,15 @@ struct FriendInfo{
 };
 
 struct MsgInfo{
+    int msgid;
     QString sendName="";
     QString recvName="";
     QString msg="";
     bool isRead=false;
 
-    void setMsgInfoVal(const QString &tempSendName,const QString &tempRecvName,const QString &tempMsg)
+    void setMsgInfoVal(int tempMsgid,const QString &tempSendName,const QString &tempRecvName,const QString &tempMsg)
     {
+        msgid=tempMsgid;
         sendName=tempSendName;
         recvName=tempRecvName;
         msg=tempMsg;
@@ -41,6 +43,10 @@ struct MsgInfo{
         return sendName==""||
                recvName==""||
                msg=="";
+    }
+
+    bool operator<(const MsgInfo&other)const{
+        return msgid<other.msgid;
     }
 };
 
@@ -53,6 +59,8 @@ public:
     void queryChatMsg(QByteArray data);
     void recvNewMsg(QByteArray data);
     void recvNewFriends(QByteArray data);
+    void recvAddFriendResult(QByteArray data);
+    void recvDeleteFriendResult(QByteArray data);
 
     QList<FriendInfo> getFriendInfoList() const;
 
@@ -66,12 +74,22 @@ public:
 
     void addMsgInfo(const MsgInfo & msg);
 
+    void setMsgInfoList(const QList<MsgInfo> &newMsgInfoList);
+
+    std::unordered_map<QString, QList<MsgInfo> > getMsgInfoLists() const;
+    void setMsgInfoLists(const std::unordered_map<QString, QList<MsgInfo> > &newMsgInfoLists);
+
 signals:
+    void recvHistoryMsg(bool result);
+    void recvDeleteMsg(bool result);
+    void recvAddFriend(bool result);
+    void recvDeleteFriend(bool result);
     void newMsg();
     void newFriends();
 private:
     QList<FriendInfo> friendInfoList;
     QList<MsgInfo> msgInfoList;
+    std::unordered_map<QString,QList<MsgInfo>> msgInfoLists;
     MsgInfo msg;
 };
 

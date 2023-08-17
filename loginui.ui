@@ -125,13 +125,24 @@
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
           <widget class="QLabel" name="label">
+           <property name="font">
+            <font>
+             <pointsize>16</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>账号：</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="nameLineEdit"/>
+          <widget class="QLineEdit" name="nameLineEdit">
+           <property name="font">
+            <font>
+             <pointsize>16</pointsize>
+            </font>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -139,18 +150,34 @@
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QLabel" name="label_2">
+           <property name="font">
+            <font>
+             <pointsize>16</pointsize>
+            </font>
+           </property>
            <property name="text">
             <string>密码：</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="pwdLineEdit"/>
+          <widget class="QLineEdit" name="pwdLineEdit">
+           <property name="font">
+            <font>
+             <pointsize>16</pointsize>
+            </font>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
        <item>
         <widget class="QPushButton" name="LoginBtn">
+         <property name="font">
+          <font>
+           <pointsize>16</pointsize>
+          </font>
+         </property>
          <property name="text">
           <string>登录</string>
          </property>
@@ -175,6 +202,11 @@
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QPushButton" name="RegisterBtn">
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>注册账号</string>
           </property>
@@ -195,6 +227,11 @@
         </item>
         <item>
          <widget class="QPushButton" name="RetrieveBtn">
+          <property name="font">
+           <font>
+            <pointsize>16</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>找回密码</string>
           </property>

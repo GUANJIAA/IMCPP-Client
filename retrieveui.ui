@@ -28,6 +28,12 @@
         <iconset resource="res.qrc">
          <normaloff>:/owl</normaloff>:/owl</iconset>
        </property>
+       <property name="iconSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
        <property name="autoRaise">
         <bool>true</bool>
        </property>
@@ -55,6 +61,12 @@
         <iconset resource="res.qrc">
          <normaloff>:/close</normaloff>:/close</iconset>
        </property>
+       <property name="iconSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
        <property name="autoRaise">
         <bool>true</bool>
        </property>
@@ -66,6 +78,11 @@
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="0">
       <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>账号：</string>
        </property>
@@ -73,6 +90,11 @@
      </item>
      <item row="0" column="1">
       <widget class="QLineEdit" name="NameLineEdit">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -80,6 +102,11 @@
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>密码：</string>
        </property>
@@ -87,6 +114,11 @@
      </item>
      <item row="1" column="1">
       <widget class="QLineEdit" name="PwdLineEdit">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -94,6 +126,11 @@
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_3">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>邮箱：</string>
        </property>
@@ -101,6 +138,11 @@
      </item>
      <item row="2" column="1">
       <widget class="QLineEdit" name="EmailLineEdit">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -108,6 +150,11 @@
      </item>
      <item row="3" column="0">
       <widget class="QLabel" name="label_4">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string>手机：</string>
        </property>
@@ -115,6 +162,11 @@
      </item>
      <item row="3" column="1">
       <widget class="QLineEdit" name="PhoneEdit">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -124,6 +176,11 @@
    </item>
    <item>
     <widget class="QPushButton" name="retrieveBtn">
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
      <property name="text">
       <string>修改密码</string>
      </property>

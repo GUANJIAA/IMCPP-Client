@@ -44,6 +44,7 @@ signals:
 public slots:
     void onNewDepartMessageReceived();
     void onNewDepartUsersReceived();
+    void onRecvHistroyMsg();
 
     void onSendBtn(bool cliecked);
     void onDepartUserSelect(QListWidgetItem*item);
